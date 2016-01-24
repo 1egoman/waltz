@@ -17,8 +17,12 @@ $ clock ls
 Logged Hours:
 Sun Jan 24 2016          10:20:00 - 11:20:00
 About 1 hours, 0 minutes, and 0 seconds
+$ clock report && google-chrome report.html
+# creates a report and opens it in chrome
 ```
 For configuration options, see `.timeclock.json` in your project directory.
+For a few example reports, see <https://gist.github.com/1egoman/ba14d9811c7ffa0ddf59>.
+
 
 ## License
  © [1egoman](rgaus.net)
