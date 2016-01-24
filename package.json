@@ -1,0 +1,49 @@
+{
+  "name": "timeclock",
+  "version": "0.0.0",
+  "description": "Track the time you work on projects",
+  "homepage": "http://github.com/1egoman/timeclock",
+  "author": {
+    "name": "1egoman",
+    "email": "rsg1egoman@gmail.com",
+    "url": "rgaus.net"
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "dist/index.js",
+  "keywords": [
+    "time",
+    "clock",
+    "timeclock",
+    "analyze",
+    "spent",
+    "development",
+    "log",
+    "hours",
+    "sheet",
+    "punch",
+    "total",
+    "out",
+    "in",
+    "clock",
+    "timesheet",
+    "timecard",
+    "track",
+    "time"
+  ],
+  "devDependencies": {},
+  "repository": "1egoman/timeclock",
+  "scripts": {
+    "prepublish": "gulp prepublish",
+    "test": "gulp"
+  },
+  "dependencies": {
+    "async": "^1.5.2",
+    "chalk": "^1.1.1",
+    "fs-extra": "^0.26.4",
+    "minimist": "^1.2.0",
+    "promise": "^7.1.1",
+    "strftime": "^0.9.2"
+  }
+}
