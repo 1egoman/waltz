@@ -96,6 +96,53 @@ describe('clock.clockIn()', function() {
     }).catch(done);
   });
 
+
+  it('should clock in at this time, clock out, then clock back in', function(done) {
+    card.clockIn().then((opts) => {
+      card.getCard().then((timecard) => {
+        assert.deepEqual(timecard, {
+          card: [{
+            date: opts.day,
+            times: [{
+              start: opts.time
+            }]
+          }]
+        });
+
+        card.clockOut().then((out_opts) => {
+          card.getCard().then((timecard) => {
+            assert.deepEqual(timecard, {
+              card: [{
+                date: opts.day,
+                times: [{
+                  start: opts.time,
+                  end: out_opts.time
+                }]
+              }]
+            });
+
+            card.clockIn().then((second_opts) => {
+              card.getCard().then((timecard) => {
+                console.log(timecard.card[0].times)
+                assert.deepEqual(timecard, {
+                  card: [{
+                    date: opts.day,
+                    times: [{
+                      start: opts.time,
+                      end: out_opts.time
+                    }, {
+                      start: second_opts.time
+                    }]
+                  }]
+                });
+                done();
+              });
+            });
+          }).catch(done);
+        }).catch(done);
+      }).catch(done);
+    }).catch(done);
+  });
 });
 
 describe('clock.clockOut()', function() {
@@ -132,5 +179,4 @@ describe('clock.clockOut()', function() {
       }).catch(done);
     }).catch(done);
   });
-
 });
