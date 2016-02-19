@@ -32,10 +32,14 @@
     "track",
     "time"
   ],
-  "devDependencies": {},
+  "devDependencies": {
+    "mock-fs": "^3.7.0"
+  },
   "repository": "1egoman/timeclock",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "istanbul cover _mocha",
+    "report": "google-chrome coverage/lcov-report/index.html"
   },
   "dependencies": {
     "async": "^1.5.2",

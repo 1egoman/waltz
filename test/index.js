@@ -2,7 +2,9 @@
 const assert = require("assert"),
       card = require("../lib/card"),
       fs = require("fs-extra"),
+      mockFs= require("mock-fs"),
       async = require("async"),
+      strftime = require("strftime"),
       sampleCard = {
         reportFormat: "default",
         hourlyRate: 50.00,
@@ -77,6 +79,119 @@ describe('clock.assertIsCard()', function() {
         end: 456,
       }]}
     ]}));
+  });
+});
+
+describe('clock.getSpotForDay()', function() {
+  it('should pick the correct timecard section for the current day', function() {
+    assert.deepEqual(card.getSpotForDay([{date: strftime(card.DAY_REPR), foo: "bar"}]), {
+      date: strftime(card.DAY_REPR),
+      foo: "bar"
+    });
+    assert.deepEqual(card.getSpotForDay([
+      {
+        date: strftime(card.DAY_REPR),
+        foo: "bar",
+      }, {
+        date: "something else",
+        foo: "baz",
+      }
+    ]), {
+      date: strftime(card.DAY_REPR),
+      foo: "bar"
+    });
+  });
+});
+
+describe('clock.totalDuration()', function() {
+  it('should get the total duration of all cards', function() {
+    assert.equal(card.totalDuration({card: []}), 0);
+    assert.equal(card.totalDuration({
+      card: [
+        {
+          date: "Mon Feb 22 2016",
+          times: [{
+            start: "11:00:00",
+            end: "12:00:00"
+          }],
+        }
+      ]
+    }), 3600); // 1 hour in seconds
+    assert.equal(card.totalDuration({
+      card: [
+        {
+          date: "Mon Feb 22 2016",
+          times: [{
+            start: "11:00:00",
+            end: "12:00:00"
+          }, {
+            start: "3:00:00",
+            end: "4:30:30",
+          }],
+        }
+      ]
+    }), 9030); // 2 hours, 30 minutes, and 30 seconds in seconds
+    assert.equal(card.totalDuration({
+      card: [
+        {
+          date: "Mon Feb 22 2016",
+          times: [{
+            start: "3:00:00",
+            end: "4:00:00",
+          }],
+        },
+        {
+          date: "Mon Feb 22 2016",
+          disabled: "Mon Feb 22 2016",
+          times: [{
+            start: "3:00:00",
+            end: "4:30:30",
+          }],
+        }
+      ]
+    }), 3600); // 1 hour (the second one is disabled)
+    assert.equal(card.totalDuration({ // test to be sure the callback for each iteraction works, too
+      card: [
+        {
+          date: "Mon Feb 22 2016",
+          times: [{
+            start: "3:00:00",
+            end: "4:00:00",
+          }],
+        },
+        {
+          date: "Mon Feb 22 2016",
+          disabled: "Mon Feb 22 2016",
+          times: [{
+            start: "3:00:00",
+            end: "4:30:30",
+          }],
+        }
+      ]
+    }, (day, time) => {
+      if (day.disabled) {
+        assert.equal(day.date, "Mon Feb 22 2016");
+        assert.deepEqual(time, {start: "3:00:00", end: "4:30:30"});
+      } else {
+        assert.equal(day.date, "Mon Feb 22 2016");
+        assert.deepEqual(time, {start: "3:00:00", end: "4:00:00"});
+      }
+    }), 3600); // 1 hour (the second one is disabled)
+  });
+});
+
+describe('clock.getReportTemplate()', function() {
+  it('should get the report for a github repo', function(done) {
+    card.getReportTemplate("1egoman/clockmaker:templates/testing.ejs").then((data) => {
+      assert.equal(data, "Hello World!\n");
+      done();
+    }).catch(console.error.bind(console));
+  });
+  it('should get the report for a default entry', function(done) {
+    card.getReportTemplate("testing").then((data) => {
+      assert.equal(data, "Hello World!\n");
+      done();
+    }).catch(console.error.bind(console));
   });
 });
 
@@ -188,6 +303,16 @@ describe('clock.cardInit()', function() {
       });
     }).catch(done);
   });
+
+  describe("mock fs causing error", function() {
+    before(() => mockFs());
+    after(() => mockFs.restore());
+    it('should reject on error', function(done) {
+      card.cardInit().then(done).catch(() => {
+        done();
+      });
+    });
+  });
 });
 
 describe('clock.clockIn()', function() {
@@ -262,6 +387,13 @@ describe('clock.clockIn()', function() {
 describe('clock.clockOut()', function() {
   beforeEach((done) => {
     fs.writeFile(".timecard.json", JSON.stringify({card: []}), done);
+  });
+
+  it('should error when clocking out without clocking in', function(done) {
+    card.clockOut().catch((err) => {
+      assert.equal(err, "You never clocked in!");
+      done();
+    });
   });
 
   it('should clock in at this time, then clock out', function(done) {
