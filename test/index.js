@@ -10,14 +10,77 @@ const assert = require("assert"),
           {
             date: "Sun Jan 24 2016",
             times: [{
-              start: "07:44:17",
-              end: "07:44:26"
+              start: "07:44:00",
+              end: "07:45:00"
+            }, {
+              start: "07:46:00",
+              end: "07:47:00"
             }]
           }
         ]
       }
 
-describe('clock.getCard()', function () {
+describe('clock.assertIsCard()', function() {
+  it("should assert good cards as true", function() {
+    assert(card.assertIsCard({card: []}));
+    assert(card.assertIsCard({card: [{date: "Fri Feb 19 2016", times: []}]}));
+    assert(card.assertIsCard({card: [
+      {date: "Fri Feb 19 2016", times: [{start: "12:20:00"}]}
+    ]}));
+    assert(card.assertIsCard({card: [
+      {date: "Fri Feb 19 2016", times: [{
+        start: "2:20:00",
+        end: "2:30:00",
+      }]}
+    ]}));
+    assert(card.assertIsCard({card: [
+      {date: "Fri Feb 19 2016", times: [{
+        start: "2:20:00",
+        end: "2:30:00",
+      }, {
+        start: "4:40:00",
+        end: "5:31:23",
+      }, {
+        start: "5:66:77",
+      }]}
+    ]}));
+    assert(card.assertIsCard({card: [
+      {date: "Fri Feb 19 2016", times: [{
+        start: "2:20:00",
+        end: "2:30:00",
+      }]},
+      {date: "Fri Feb 18 2016", times: [{
+        start: "2:20:00",
+        end: "2:30:00",
+      }]},
+    ]}));
+    assert(card.assertIsCard({card: [
+      {date: "Fri Feb 19 2016", times: [{
+        start: "2:20:00",
+        end: "2:30:00",
+      }]},
+      {date: "Mon Feb 22 2016", times: [{
+        start: "2:20:00",
+        end: "2:30:00",
+        disabled: "Wed Feb 24 2016"
+      }]},
+    ]}));
+  });
+  it("should assert bad cards as false", function() {
+    assert(!card.assertIsCard("not an object"));
+    assert(!card.assertIsCard({card: ["not an object"]}));
+    assert(!card.assertIsCard({card: [{date: "Fri Feb 19 2016", times: ["not an object"]}]}));
+    assert(!card.assertIsCard({card: [{date: "Fri Feb 19 2016", times: [{end: "no start"}]}]}));
+    assert(!card.assertIsCard({card: [ // a smart ass with unix epoch time
+      {date: 11111, times: [{
+        start: 123,
+        end: 456,
+      }]}
+    ]}));
+  });
+});
+
+describe('clock.getCard()', function() {
   // remove the files afterward
   // don't remove .timecard.json though, we'll need that one for further tests
   after((done) => {
@@ -49,6 +112,58 @@ describe('clock.getCard()', function () {
     card.getCard().then((card) => {
       assert.deepEqual(card, sampleCard);
     })
+  });
+});
+
+describe('clock.getTimecardRenderDetails()', function() {
+  it('should correctly return the timecard', function() {
+    assert.deepEqual(card.getTimecardRenderDetails({card: []}, {}), {
+      timecard: {card: []},
+      args: {},
+      totalTime: 0,
+      totalCost: null,
+    });
+
+    let card_for_test = [
+      {
+        date: "Mon Feb 22 2016", times: [
+          {
+            start: "10:00:00", end: "11:00:00"
+          }
+        ]
+      }
+    ];
+    assert.deepEqual(card.getTimecardRenderDetails({card: card_for_test}, {}), {
+      timecard: {card: card_for_test},
+      args: {},
+      totalTime: 3600,
+      totalCost: null,
+    });
+  });
+  it('should correctly calculate the cost of a timecard', function() {
+    assert.deepEqual(card.getTimecardRenderDetails(sampleCard), {
+      timecard: sampleCard,
+      args: {},
+      totalTime: 120,
+      totalCost: 1.67,
+    });
+  });
+  it('should be sure that any args passd are returned', function() {
+    assert.deepEqual(card.getTimecardRenderDetails({card: []}, {foo: "bar", another: 1}), {
+      timecard: {card: []},
+      args: {foo: "bar", another: 1},
+      totalTime: 0,
+      totalCost: null,
+    });
+    assert.deepEqual(card.getTimecardRenderDetails({card: [], args: {foo: "bar", another: 1}}), {
+      timecard: {
+        args: {foo: "bar", another: 1},
+        card: [],
+      },
+      args: {foo: "bar", another: 1},
+      totalTime: 0,
+      totalCost: null,
+    });
   });
 });
 
@@ -123,7 +238,6 @@ describe('clock.clockIn()', function() {
 
             card.clockIn().then((second_opts) => {
               card.getCard().then((timecard) => {
-                console.log(timecard.card[0].times)
                 assert.deepEqual(timecard, {
                   card: [{
                     date: opts.day,
