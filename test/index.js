@@ -391,8 +391,19 @@ describe('clock.clockOut()', function() {
 
   it('should error when clocking out without clocking in', function(done) {
     card.clockOut().catch((err) => {
-      assert.equal(err, "You never clocked in!");
+      assert.equal(err.message, "You never clocked in!");
       done();
+    });
+  });
+
+  it('should error when clocking out without clocking in', function(done) {
+    card.clockIn()
+    .then(card.clockOut)
+    .then(() => {
+      card.clockOut().catch((err) => {
+        assert.equal(err.message, "There aren't any currently open times that can be closed.");
+        done();
+      });
     });
   });
 
