@@ -1,7 +1,7 @@
 {
-  "name": "timeclock",
+  "name": "waltz",
   "version": "0.4.0",
-  "description": "Track the time you work on projects",
+  "description": "Check the time that you spend on projects",
   "homepage": "http://github.com/1egoman/timeclock",
   "author": {
     "name": "1egoman",

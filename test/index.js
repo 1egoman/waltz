@@ -22,7 +22,7 @@ const assert = require("assert"),
         ]
       }
 
-describe('clock.assertIsCard()', function() {
+describe('card.assertIsCard()', function() {
   it("should assert good cards as true", function() {
     assert(card.assertIsCard({card: []}));
     assert(card.assertIsCard({card: [{date: "Fri Feb 19 2016", times: []}]}));
@@ -82,7 +82,7 @@ describe('clock.assertIsCard()', function() {
   });
 });
 
-describe('clock.getSpotForDay()', function() {
+describe('card.getSpotForDay()', function() {
   it('should pick the correct timecard section for the current day', function() {
     assert.deepEqual(card.getSpotForDay([{date: strftime(card.DAY_REPR), foo: "bar"}]), {
       date: strftime(card.DAY_REPR),
@@ -103,7 +103,7 @@ describe('clock.getSpotForDay()', function() {
   });
 });
 
-describe('clock.totalDuration()', function() {
+describe('card.totalDuration()', function() {
   it('should get the total duration of all cards', function() {
     assert.equal(card.totalDuration({card: []}), 0);
     assert.equal(card.totalDuration({
@@ -180,7 +180,7 @@ describe('clock.totalDuration()', function() {
   });
 });
 
-describe('clock.getReportTemplate()', function() {
+describe('card.getReportTemplate()', function() {
   it('should get the report for a github repo', function(done) {
     card.getReportTemplate("1egoman/clockmaker:templates/testing.ejs").then((data) => {
       assert.equal(data, "Hello World!\n");
@@ -195,7 +195,7 @@ describe('clock.getReportTemplate()', function() {
   });
 });
 
-describe('clock.getCard()', function() {
+describe('card.getCard()', function() {
   // remove the files afterward
   // don't remove .timecard.json though, we'll need that one for further tests
   after((done) => {
@@ -230,7 +230,7 @@ describe('clock.getCard()', function() {
   });
 });
 
-describe('clock.getTimecardRenderDetails()', function() {
+describe('card.getTimecardRenderDetails()', function() {
   it('should correctly return the timecard', function() {
     assert.deepEqual(card.getTimecardRenderDetails({card: []}, {}), {
       timecard: {card: []},
@@ -282,7 +282,7 @@ describe('clock.getTimecardRenderDetails()', function() {
   });
 });
 
-describe('clock.cardInit()', function() {
+describe('card.cardInit()', function() {
   beforeEach((done) => {
     fs.remove(".timecard.json", done);
   });
@@ -315,13 +315,13 @@ describe('clock.cardInit()', function() {
   });
 });
 
-describe('clock.clockIn()', function() {
+describe('card.waltzIn()', function() {
   beforeEach((done) => {
     fs.writeFile(".timecard.json", JSON.stringify({card: []}), done);
   });
 
-  it('should clock in at this time', function(done) {
-    card.clockIn().then((opts) => {
+  it('should waltz in at this time', function(done) {
+    card.waltzIn().then((opts) => {
       card.getCard().then((timecard) => {
         assert.deepEqual(timecard, {
           card: [{
@@ -337,8 +337,8 @@ describe('clock.clockIn()', function() {
   });
 
 
-  it('should clock in at this time, clock out, then clock back in', function(done) {
-    card.clockIn().then((opts) => {
+  it('should waltz in at this time, waltz out, then waltz back in', function(done) {
+    card.waltzIn().then((opts) => {
       card.getCard().then((timecard) => {
         assert.deepEqual(timecard, {
           card: [{
@@ -349,7 +349,7 @@ describe('clock.clockIn()', function() {
           }]
         });
 
-        card.clockOut().then((out_opts) => {
+        card.waltzOut().then((out_opts) => {
           card.getCard().then((timecard) => {
             assert.deepEqual(timecard, {
               card: [{
@@ -361,7 +361,7 @@ describe('clock.clockIn()', function() {
               }]
             });
 
-            card.clockIn().then((second_opts) => {
+            card.waltzIn().then((second_opts) => {
               card.getCard().then((timecard) => {
                 assert.deepEqual(timecard, {
                   card: [{
@@ -384,31 +384,31 @@ describe('clock.clockIn()', function() {
   });
 });
 
-describe('clock.clockOut()', function() {
+describe('card.waltzOut()', function() {
   beforeEach((done) => {
     fs.writeFile(".timecard.json", JSON.stringify({card: []}), done);
   });
 
-  it('should error when clocking out without clocking in', function(done) {
-    card.clockOut().catch((err) => {
-      assert.equal(err.message, "You never clocked in!");
+  it('should error when waltzing out without waltzing in', function(done) {
+    card.waltzOut().catch((err) => {
+      assert.equal(err.message, "You never waltzed in!");
       done();
     });
   });
 
-  it('should error when clocking out without clocking in', function(done) {
-    card.clockIn()
-    .then(card.clockOut)
+  it('should error when waltzing out without waltzing in', function(done) {
+    card.waltzIn()
+    .then(card.waltzOut)
     .then(() => {
-      card.clockOut().catch((err) => {
+      card.waltzOut().catch((err) => {
         assert.equal(err.message, "There aren't any currently open times that can be closed.");
         done();
       });
     });
   });
 
-  it('should clock in at this time, then clock out', function(done) {
-    card.clockIn().then((opts) => {
+  it('should waltz in at this time, then waltz out', function(done) {
+    card.waltzIn().then((opts) => {
       card.getCard().then((timecard) => {
         assert.deepEqual(timecard, {
           card: [{
@@ -419,7 +419,7 @@ describe('clock.clockOut()', function() {
           }]
         });
 
-        card.clockOut().then((out_opts) => {
+        card.waltzOut().then((out_opts) => {
           card.getCard().then((timecard) => {
             assert.deepEqual(timecard, {
               card: [{

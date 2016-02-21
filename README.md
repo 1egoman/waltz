@@ -1,23 +1,23 @@
-# timeclock [![NPM version][npm-image]][npm-url] [![Dependency Status][daviddm-image]][daviddm-url]
+# Waltz [![NPM version][npm-image]][npm-url] [![Dependency Status][daviddm-image]][daviddm-url]
 > Track the time you work on projects
 
 ## Installation
 
 ```sh
-$ npm install --global timeclock
+$ npm install --global waltz
 ```
 
 ## Usage
 ```bash
-$ clock init
-$ clock in
+$ waltz init
+$ waltz in
 $ # wait a while...
-$ clock out
-$ clock ls
+$ waltz out
+$ waltz ls
 Logged Hours:
 Sun Jan 24 2016          10:20:00 - 11:20:00
 About 1 hours, 0 minutes, and 0 seconds
-$ clock report && google-chrome report.html
+$ waltz report && google-chrome report.html
 # creates a report and opens it in chrome
 ```
 For configuration options, see `.timeclock.json` in your project directory.
