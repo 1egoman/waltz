@@ -57,6 +57,7 @@
     "underscore": "^1.8.3"
   },
   "bin": {
+    "waltz": "./lib/index.js",
     "clock": "./lib/index.js"
   }
 }
