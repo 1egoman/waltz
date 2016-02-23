@@ -38,7 +38,7 @@
   "repository": "1egoman/timeclock",
   "scripts": {
     "test": "NODE_ENV=test mocha",
-    "coverage": "istanbul cover _mocha",
+    "coverage": "NODE_ENV=test istanbul cover _mocha",
     "report": "google-chrome coverage/lcov-report/index.html"
   },
   "dependencies": {
