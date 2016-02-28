@@ -327,7 +327,8 @@ describe('card.waltzIn()', function() {
           card: [{
             date: opts.day,
             times: [{
-              start: opts.time
+              start: opts.time,
+              by: "a-username",
             }]
           }]
         });
@@ -344,7 +345,8 @@ describe('card.waltzIn()', function() {
           card: [{
             date: opts.day,
             times: [{
-              start: opts.time
+              start: opts.time,
+              by: "a-username",
             }]
           }]
         });
@@ -356,7 +358,8 @@ describe('card.waltzIn()', function() {
                 date: opts.day,
                 times: [{
                   start: opts.time,
-                  end: out_opts.time
+                  end: out_opts.time,
+                  by: "a-username",
                 }]
               }]
             });
@@ -368,9 +371,11 @@ describe('card.waltzIn()', function() {
                     date: opts.day,
                     times: [{
                       start: opts.time,
-                      end: out_opts.time
+                      end: out_opts.time,
+                      by: "a-username",
                     }, {
-                      start: second_opts.time
+                      start: second_opts.time,
+                      by: "a-username",
                     }]
                   }]
                 });
@@ -396,12 +401,12 @@ describe('card.waltzOut()', function() {
     });
   });
 
-  it('should error when waltzing out without waltzing in', function(done) {
+  it('should error when waltzing out without an empty time', function(done) {
     card.waltzIn()
     .then(card.waltzOut)
     .then(() => {
       card.waltzOut().catch((err) => {
-        assert.equal(err.message, "There aren't any currently open times that can be closed.");
+        assert.equal(err.message, "There aren't any currently open times that can be closed. Most likely, you ran `waltz out` twice.");
         done();
       });
     });
@@ -414,7 +419,8 @@ describe('card.waltzOut()', function() {
           card: [{
             date: opts.day,
             times: [{
-              start: opts.time
+              start: opts.time,
+              by: "a-username",
             }]
           }]
         });
@@ -426,7 +432,8 @@ describe('card.waltzOut()', function() {
                 date: opts.day,
                 times: [{
                   start: opts.time,
-                  end: out_opts.time
+                  end: out_opts.time,
+                  by: "a-username",
                 }]
               }]
             });
