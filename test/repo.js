@@ -4,11 +4,13 @@ const assert = require("assert"),
       fs = require("fs-extra"),
       mockFs= require("mock-fs"),
       async = require("async"),
-      strftime = require("strftime");
+      strftime = require("strftime"),
+      sinon = require("sinon"),
+      request = require("request");
 
 describe("repo.getFileFromRepo", function() {
   it("should get a file from the repo", function(done) {
-    repo.getFileFromRepo("1egoman", "timeclock", "clock", "dev").then((data) => {
+    repo.getFileFromRepo("1egoman", "waltz", "waltz", "dev").then((data) => {
       assert.equal(data, "#!/bin/bash\nnode lib/index.js $@\n");
       done();
     }).catch(done);

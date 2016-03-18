@@ -33,7 +33,8 @@
     "time"
   ],
   "devDependencies": {
-    "mock-fs": "^3.7.0"
+    "mock-fs": "^3.7.0",
+    "sinon": "^1.17.3"
   },
   "repository": "1egoman/timeclock",
   "scripts": {
