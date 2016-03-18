@@ -5,6 +5,7 @@ const assert = require("assert"),
       sinon = require("sinon"),
       chalk = require("chalk"),
       fs = require("fs"),
+      mockFs = require("mock-fs"),
       ejs = require("ejs"),
       Promise = require("promise");
 
@@ -48,19 +49,51 @@ describe('lib/index.js', function() {
   describe('waltz report', function() {
     beforeEach(() => {
       sinon.stub(card, "getCard", () => new Promise((r) => r({card: []}))); // a self-resolving promise
-      sinon.stub(fs, "writeFile", (a,b,cb) => cb(null));
-      sinon.stub(ejs, "render", (a,b,cb) => "ejs-render-out");
+      sinon.stub(card, "getReportTemplate", () => {
+        return new Promise((resolve, reject) => {resolve(`
+          Timecard: <%= JSON.stringify(timecard) %>
+          Total Time: <%= totalTime %>
+          Total Cost: <%= totalCost %>
+          [end]`
+        )});
+      });
+      sinon.spy(console, "log");
+      mockFs();
     });
     afterEach(() => {
       card.getCard.restore();
-      fs.writeFile.restore();
-      ejs.render.restore();
+      card.getReportTemplate.restore();
+      console.log.restore();
+      mockFs.restore();
     });
-    it("should spit out an invoice when run with 'report'", function(done) {
-      index.run("report", {print: false}, () => {
-        assert(card.getCard.calledWith());
-        assert.equal(fs.writeFile.getCall(0).args[0], "report.html");
-        assert.equal(fs.writeFile.getCall(0).args[1], "ejs-render-out");
+
+    it("should spit out an invoice when run with 'report' to a file", function(done) {
+      index.run("report", {}, () => {
+        assert(card.getCard.calledWithExactly());
+        assert(card.getReportTemplate.calledWith("default"));
+        fs.readFile("report.html", (err, contents) => {
+          if (err) {
+            done(err);
+          } else {
+            assert.deepEqual(contents.toString(), `
+          Timecard: {&#34;card&#34;:[]}
+          Total Time: 0
+          Total Cost: 
+          [end]`);
+            done();
+          }
+        });
+      });
+    });
+    it("should spit out an invoice when run with 'report' to stdout", function(done) {
+      index.run("report", {print: true}, () => {
+        assert(card.getCard.calledWithExactly());
+        assert(card.getReportTemplate.calledWith("default"));
+        assert(console.log.calledWith(`
+          Timecard: {&#34;card&#34;:[]}
+          Total Time: 0
+          Total Cost: 
+          [end]`));
         done();
       });
     });
