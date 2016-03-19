@@ -12,7 +12,7 @@ describe('watch.getWatchArgsFor', function() {
       ignored: /([\/\\]\.|node_modules|\.timecard\.json|\.git)/,
       verbose: false,
       quiet: false,
-      watchDir: '.',
+      watchdir: '.',
       oldfile: 10 * 60 * 1000, // 10 minutes
     });
   });
@@ -20,12 +20,12 @@ describe('watch.getWatchArgsFor', function() {
     assert.deepEqual(watch.getWatchArgsFor({
       v: true,
       quiet: true,
-      watchDir: '/foo/bar/baz'
+      watchdir: '/foo/bar/baz'
     }), {
       ignored: /([\/\\]\.|node_modules|\.timecard\.json|\.git)/,
       verbose: true,
       quiet: true,
-      watchDir: '/foo/bar/baz',
+      watchdir: '/foo/bar/baz',
       oldfile: 10 * 60 * 1000, // 10 minutes
     });
     assert.deepEqual(watch.getWatchArgsFor({
@@ -35,7 +35,7 @@ describe('watch.getWatchArgsFor', function() {
       ignored: /abc/,
       verbose: false,
       quiet: false,
-      watchDir: '.',
+      watchdir: '.',
       oldfile: 15 * 60 * 1000, // 10 minutes
     });
   });
